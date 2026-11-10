@@ -1,0 +1,4 @@
+# The Dockerfile copies only its dependency list from the project root.
+**
+!airflow/
+!airflow/requirements-sanlam.txt
