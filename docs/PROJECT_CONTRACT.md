@@ -205,7 +205,9 @@ Priority improvements are late-change/delete capture, batch/snapshot boundaries,
 
 ## 10. Publication boundary
 
-Publish reusable code, notebooks without outputs, orchestration/build files, metadata SQL, environment template, README, this contract, Tableau definition, and only `output/pdf/sanlam_project_report_25_26.pdf`.
+Publish reusable code, notebooks without outputs, orchestration/build files, metadata SQL, environment template, README, this contract, Tableau definition, the two supplied screenshots (`assets/airflow-dag.png` and `assets/claims-dashboard.png`), and only `output/pdf/sanlam_project_report_25_26.pdf`.
+
+The screenshots illustrate a historical successful Airflow run and a claims dashboard over synthetic data. The run's displayed duration is specific to that execution. Dashboard totals are not asserted to match the latest canonical exports; adding these images does not constitute a new pipeline run.
 
 The `.gitignore` allowlist excludes other root files and limits included directories. Other docs, report sources/assets/research, older PDFs, handoff/history notes, temporary material, local environments, extracts, logs, configuration state, and recovery files remain on disk. `.dockerignore` limits image build context to the required dependency file.
 

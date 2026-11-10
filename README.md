@@ -6,22 +6,45 @@ An end-to-end insurance analytics project built during an introductory internshi
 
 The project uses generated insurance records. Dashboard amounts, risk scores, and fraud flags are demonstration data; they do not describe Sanlam's customers or financial results. This repository documents a local portfolio prototype.
 
+## Dashboard preview
+
+![Tableau claims dashboard showing claimed versus approved amounts, claim types and statuses, paid claim totals, and synthetic fraud flags.](assets/claims-dashboard.png)
+
+The claims dashboard connects claim amounts, statuses, types, and paid claim totals in one reporting view. Fraud flags are generated demonstration attributes, rather than predictions from a fraud-detection model. This screenshot preserves a historical dashboard snapshot; its totals are not presented as current Sanlam results or as a reconciliation to the latest exports.
+
+## Successful pipeline execution
+
+![Successful Airflow run showing source generation, nine parallel ingestion tasks, Raw-to-Silver and Silver-to-Gold transformations, and Tableau CSV export.](assets/airflow-dag.png)
+
+The supplied Airflow screenshot records a successful scheduled run on **22 August 2026**. All **13 tasks** completed, from synthetic source changes through Tableau CSV export. The displayed run duration is **7 minutes 38 seconds**; this is evidence of that historical execution, rather than a general performance benchmark or a new execution performed for this README.
+
+| Pipeline scope | Implemented |
+|---|---|
+| Oracle business source tables | 9 |
+| Data lake layers | Raw, Silver, and Gold |
+| Gold reporting datasets / CSV exports | 5 |
+| Saved Tableau dashboards | 4 |
+| Airflow tasks | 13 |
+| Scheduled interval | Every four days |
+
 ## Architecture
 
 ```mermaid
-flowchart LR
-    O[(Oracle)] -->|Python / Pandas| R[MinIO Raw: Parquet batches]
-    R -->|PySpark: clean and validate| S[MinIO Silver: current state]
-    S -->|PySpark: aggregate and join| G[MinIO Gold: reporting datasets]
-    G -->|Export contract| C[Five CSV files]
-    C -->|Manual refresh| T[Tableau dashboards]
-    A[Airflow in Docker] -. orchestrates .-> O
-    A -. orchestrates .-> S
-    A -. orchestrates .-> G
-    A -. orchestrates .-> C
+flowchart TD
+    O[(Oracle)] -->|"Python / Pandas: incremental extraction"| R["MinIO Raw: Parquet batches"]
+    R -->|"PySpark: clean and validate"| S["MinIO Silver: current state"]
+    S -->|"PySpark: aggregate and join"| G["MinIO Gold: reporting datasets"]
+    G -->|"Named column contracts"| C["Five CSV exports"]
+    C -->|"Manual refresh"| T["Tableau dashboards"]
+    A["Airflow in Docker: seed, ingest, transform, export"] -. "Orchestrates" .-> O
+    A -. "Orchestrates" .-> S
+    A -. "Orchestrates" .-> G
+    A -. "Orchestrates" .-> C
 ```
 
 Oracle and Tableau run outside the Airflow stack. MinIO runs as a separate container. PostgreSQL stores Airflow metadata, and Redis supports its Celery executor. Spark uses Hadoop's S3A connector to access MinIO; the project does not deploy AWS or a separate Hadoop cluster.
+
+Ingestion captures new and updated rows using per-table watermarks. Silver reconstructs the latest records from accumulated Raw history, and Gold rebuilds business datasets. Airflow automates the workflow through CSV publication; Tableau Desktop refresh remains manual.
 
 ## What it demonstrates
 
@@ -54,6 +77,7 @@ notebooks/              Four original development notebooks, with outputs cleare
 sql/SANLAM.sql          ETL_METADATA initialization and inspection SQL
 docs/PROJECT_CONTRACT.md Architecture, data contracts, setup, and operational limits
 output/pdf/             One retained final internship report
+assets/                 Claims dashboard and successful Airflow-run screenshots
 dashboard.twb           Tableau workbook definition
 .env.example            Configuration template without real credentials
 requirements.txt        Host Python dependencies
@@ -89,6 +113,6 @@ This publication was checked for Python/notebook syntax, export schema consisten
 
 ## Publication policy
 
-Git tracks only the selected deliverables. Environment files, generated CSVs, Airflow logs/configuration, virtual environments, temporary files, Tableau recovery files, internal handoff/history documents, report sources, supporting research assets, and older PDFs stay local. The only published file under `docs/` is `PROJECT_CONTRACT.md`; the only published file under `output/` is the report linked above.
+Git tracks only the selected deliverables, including the two supplied screenshots in `assets/`. Environment files, generated CSVs, Airflow logs/configuration, virtual environments, temporary files, Tableau recovery files, internal handoff/history documents, report sources, supporting research assets, and older PDFs stay local. The only published file under `docs/` is `PROJECT_CONTRACT.md`; the only published file under `output/` is the report linked above.
 
 Third-party names, logos, and report illustrations retain their respective ownership. This repository presents student work and does not imply company endorsement.

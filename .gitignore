@@ -13,6 +13,10 @@
 !/sql/
 !/docs/
 !/output/
+!/assets/
+/assets/*
+!/assets/airflow-dag.png
+!/assets/claims-dashboard.png
 /src/*
 !/src/*.py
 /notebooks/*
